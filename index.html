@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html,body{margin:0}</style>
+<title>RockFord Roleplay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap&subset=cyrillic">
+<style>
+/* Layout: тёмная сцена с огромной металлической «R» справа в hero, секции-вкладки сверху, тонкие диагонали из логотипа как фон. */
+:root{
+  --bg:#08080a;
+  --bg2:#101013;
+  --line:#26262c;
+  --fg:#e9e9ec;
+  --mute:#9a9aa3;
+  --silver:#d9d9de;
+  --ok:#5fd18a;
+  --display:'Unbounded','Arial Black',system-ui,sans-serif;
+  --body:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:max(16px,env(safe-area-inset-left,0px));overflow-x:hidden}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1120px;margin-inline:auto}
+:focus-visible{outline:2px solid var(--silver);outline-offset:3px}
+
+/* progress */
+#bar{position:fixed;left:0;top:0;height:2px;width:0;background:linear-gradient(90deg,#444,#fff);z-index:60}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;margin-inline:-16px;padding-inline:16px;background:rgba(8,8,10,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:20px;height:60px;max-width:1120px;margin-inline:auto}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.04em;text-decoration:none;flex:none}
+.brand svg{width:26px;height:26px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;justify-content:flex-end}
+.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;background:none;border:0;color:var(--mute);font:500 14px var(--body);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;position:relative;transition:color .2s,background .2s}
+.tab:hover{color:var(--fg)}
+.tab[aria-current="true"]{color:#08080a;background:var(--silver)}
+
+/* hero */
+.hero{position:relative;padding-block:72px 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(95,209,138,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(95,209,138,0)}100%{box-shadow:0 0 0 0 rgba(95,209,138,0)}}
+h1{font-size:clamp(40px,7vw,84px);font-weight:800;letter-spacing:-.02em;margin-block:22px 18px}
+h1 span{background:linear-gradient(100deg,#55555c 0%,#fff 45%,#bdbdc4 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mute);font-size:18px;max-width:46ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 15px var(--body);padding:14px 24px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;text-decoration:none;transition:transform .2s,background .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px);border-color:#55555c}
+.btn.primary{background:var(--silver);color:#08080a;border-color:var(--silver)}
+.btn.primary:hover{background:#fff}
+.hero-art{position:relative;aspect-ratio:1;max-width:100%;width:100%}
+.hero-art svg{width:100%;height:100%;overflow:visible}
+#bigR{transition:transform .1s linear;transform-origin:50% 50%}
+.shine{animation:shine 6s ease-in-out infinite}
+@keyframes shine{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* ip strip */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:16px;background:var(--bg2);overflow:hidden}
+.strip>div{padding:20px 22px;border-right:1px solid var(--line);min-width:0}
+.strip>div:last-child{border-right:0}
+.k{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.v{font-family:var(--display);font-weight:700;font-size:20px;margin-top:6px;overflow-wrap:anywhere}
+.ipbtn{all:unset;cursor:pointer;display:block;font-family:var(--mono);font-size:16px;margin-top:8px;overflow-wrap:anywhere}
+.ipbtn:focus-visible{outline:2px solid var(--silver);outline-offset:3px}
+
+/* sections */
+section{padding-block:96px 0}
+.sec-head{display:flex;flex-direction:column;gap:12px;margin-bottom:36px;max-width:60ch}
+.sec-head h2{font-size:clamp(28px,4.4vw,48px);font-weight:800;letter-spacing:-.015em}
+.sec-head p{color:var(--mute)}
+
+.grid4{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:28px;min-width:0;transition:border-color .25s,transform .25s}
+.card:hover{border-color:#4a4a52;transform:translateY(-3px)}
+.card h3{font-size:18px;margin-bottom:10px}
+.card p{color:var(--mute);font-size:15px}
+.card .k{margin-bottom:18px;display:block}
+.c-wide{grid-column:span 7}.c-narrow{grid-column:span 5}.c-half{grid-column:span 6}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line)}
+.step{padding:26px 22px 0 0;position:relative;min-width:0}
+.step::before{content:"";position:absolute;top:-4px;left:0;width:7px;height:7px;background:var(--silver);transform:rotate(45deg)}
+.step .n{font:500 12px var(--mono);color:var(--mute)}
+.step h3{font-size:16px;margin-block:8px}
+.step p{color:var(--mute);font-size:14px}
+
+/* rules */
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 4px;font:700 17px var(--display);min-width:0}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:400 26px var(--body);color:var(--mute);transition:transform .25s;flex:none}
+details[open] summary::after{transform:rotate(45deg)}
+details .body{padding:0 4px 24px;color:var(--mute);max-width:70ch}
+.term{font:500 12px var(--mono);color:var(--silver);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+
+/* donate */
+.donate{display:grid;grid-template-columns:1.25fr .75fr;gap:24px;align-items:start}
+.tiers{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;min-width:0}
+.tier{appearance:none;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;min-width:0;transition:border-color .2s,transform .2s,background .2s}
+.tier:hover{transform:translateY(-3px);border-color:#4a4a52}
+.tier[aria-pressed="true"]{border-color:var(--silver);background:linear-gradient(160deg,#1b1b20,#101013)}
+.tier .name{font:700 18px var(--display)}
+.tier .price{font:800 28px var(--display)}
+.tier .price small{font:500 14px var(--body);color:var(--mute)}
+.tier ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;color:var(--mute);font-size:14px}
+.tier li{display:flex;gap:10px}
+.tier li::before{content:"";flex:none;width:6px;height:6px;margin-top:8px;background:var(--silver);transform:rotate(45deg)}
+.pay{position:sticky;top:84px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:16px;min-width:0}
+.pay h3{font-size:18px}
+label{display:grid;gap:6px;font:500 13px var(--body);color:var(--mute)}
+input[type=text],select{width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:500 15px var(--body)}
+input[type=text]:focus,select:focus{outline:2px solid var(--silver);outline-offset:1px}
+.sum{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px dashed var(--line);padding-top:14px}
+.sum b{font:800 24px var(--display)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--mute)}
+.chk input{margin-top:3px;accent-color:#d9d9de;flex:none}
+.chk button{all:unset;cursor:pointer;text-decoration:underline;color:var(--fg)}
+.chk button:focus-visible{outline:2px solid var(--silver)}
+.note{font-size:13px;color:var(--mute);min-height:20px}
+.note.err{color:#ff9d9d}.note.ok{color:var(--ok)}
+.methods{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font:500 12px var(--mono);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--mute)}
+
+/* docs */
+.dtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.dtab{appearance:none;font:600 14px var(--body);color:var(--mute);background:transparent;border:1px solid var(--line);border-radius:10px;padding:12px 18px;cursor:pointer;transition:all .2s}
+.dtab:hover{color:var(--fg)}
+.dtab[aria-selected="true"]{background:var(--silver);color:#08080a;border-color:var(--silver)}
+.doc{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,40px);max-height:560px;overflow:auto}
+.doc h3{font-size:20px;margin-bottom:6px}
+.doc h4{font:700 15px var(--body);margin:24px 0 6px;color:var(--fg)}
+.doc p,.doc li{color:var(--mute);font-size:15px;max-width:75ch}
+.doc ul{padding-left:20px;margin:6px 0}
+.doc .date{font:500 12px var(--mono);color:var(--mute);margin-bottom:14px;display:block}
+.tbl{width:100%;border-collapse:collapse;font-size:15px}
+.tbl th,.tbl td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.tbl td:last-child{font-weight:600;min-width:170px}
+.cur{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.curb{appearance:none;font:600 14px var(--body);color:var(--mute);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;transition:all .2s}
+.curb:hover{color:var(--fg)}
+.curb[aria-pressed="true"]{background:var(--silver);color:#08080a;border-color:var(--silver)}
+.tblwrap{overflow-x:auto}
+
+/* contacts */
+.contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ct{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:10px;min-width:0}
+.ct .val{font:500 15px var(--mono);overflow-wrap:anywhere;color:var(--fg)}
+.ct button.copy{justify-self:start}
+.copy{appearance:none;font:600 13px var(--body);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer}
+.copy:hover{border-color:#55555c}
+
+footer{margin-top:120px;border-top:1px solid var(--line);padding-block:36px 48px;display:grid;gap:14px;color:var(--mute);font-size:13px}
+.flinks{display:flex;gap:18px;flex-wrap:wrap}
+.flinks button{all:unset;cursor:pointer;color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+.flinks button:focus-visible{outline:2px solid var(--silver)}
+.verify{font:500 12px var(--mono);color:#6e6e77}
+
+/* reveal: видно по умолчанию, скрыто только то, что ниже экрана */
+.rv{transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.pre{opacity:0;transform:translateY(28px)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--silver);color:#08080a;font:600 14px var(--body);padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:all .3s;z-index:80}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-block:40px 32px}
+  .hero-art{max-width:340px;margin-inline:auto;order:-1}
+  .strip{grid-template-columns:1fr 1fr}
+  .strip>div:nth-child(2){border-right:0}
+  .strip>div:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .steps{grid-template-columns:1fr 1fr;row-gap:28px}
+  .donate{grid-template-columns:1fr}
+  .pay{position:static}
+  .contacts{grid-template-columns:1fr}
+  .c-wide,.c-narrow,.c-half{grid-column:span 12}
+  .brand b{display:none}
+  .nav{gap:8px}
+  section{padding-block:72px 0}
+}
+@media (max-width:520px){
+  .tiers{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .tab{padding:8px 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv.pre{opacity:1;transform:none}
+}
+</style>
+
+<div id="bar"></div>
+
+<header>
+  <div class="nav">
+    <a class="brand" href="#top" data-go="top" aria-label="RockFord, на главную">
+      <svg viewBox="100 100 440 440" aria-hidden="true"><use href="#rmark"/></svg><b>ROCKFORD</b>
+    </a>
+    <nav class="tabs" id="tabs" aria-label="Разделы сайта">
+      <button class="tab" data-go="top">Главная</button>
+      <button class="tab" data-go="about">О сервере</button>
+      <button class="tab" data-go="start">Как начать</button>
+      <button class="tab" data-go="rules">Правила</button>
+      <button class="tab" data-go="donate">Донат</button>
+      <button class="tab" data-go="docs">Документы</button>
+      <button class="tab" data-go="contacts">Контакты</button>
+    </nav>
+  </div>
+</header>
+
+<!-- общая метка логотипа -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gTop" x1="125" y1="0" x2="390" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0c0c0e"/><stop offset=".55" stop-color="#d9d9de"/><stop offset="1" stop-color="#e6e6ea"/>
+    </linearGradient>
+    <linearGradient id="gBot" x1="180" y1="318" x2="320" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7d7d84"/><stop offset=".45" stop-color="#dcdce0"/><stop offset="1" stop-color="#e4e4e8"/>
+    </linearGradient>
+    <g id="rmark">
+      <path d="M125 127H380C450 127 505 175 505 245C505 305 470 350 428 376L376 310C405 298 418 275 418 250C418 225 400 212 380 212H186Z" fill="url(#gTop)"/>
+      <path d="M182 318H368L515 513H430L335 392H262V513H182Z" fill="url(#gBot)"/>
+    </g>
+  </defs>
+</svg>
+
+<main class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <span class="eyebrow rv"><i class="dot"></i> Minecraft 1.21.11 · Средневековый Roleplay</span>
+      <h1 class="rv d1">Rock<span>Ford</span></h1>
+      <p class="lead rv d2">Ролевой сервер Minecraft в духе средневековья: свои ремёсла, торговля и сюжеты. Создайте персонажа, купите дом и найдите своё место в городе. Вход на сервер по whitelist: заявки одобряют в Discord.</p>
+      <div class="cta rv d3">
+        <a class="btn primary" id="heroDiscord" href="#" target="_blank" rel="noopener">Подать заявку в Discord</a>
+        <button class="btn" data-go="start">Как попасть на сервер</button>
+      </div>
+    </div>
+    <div class="hero-art rv d2" aria-hidden="true">
+      <svg viewBox="0 0 640 640">
+        <g stroke="#2a2a30" stroke-width="1.4" fill="none">
+          <path d="M360 0L540 258L640 205"/>
+          <path d="M0 370L305 470L278 640"/>
+          <circle cx="482" cy="55" r="15"/><circle cx="122" cy="478" r="15"/>
+          <path d="M532 158l30 30M562 158l-30 30M36 576l32 32M68 576l-32 32"/>
+        </g>
+        <g id="bigR"><use href="#rmark" class="shine"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="strip rv">
+    <div><span class="k">Версия</span><div class="v">1.21.11</div></div>
+    <div><span class="k">Доступ</span><div class="v">Whitelist</div></div>
+    <div><span class="k">Онлайн</span><div class="v" id="online"><span id="onDot" class="dot" style="display:inline-block;margin-right:8px;vertical-align:middle;background:var(--mute);animation:none"></span><span id="onText">—</span></div></div>
+    <div><span class="k">IP сервера</span><button class="ipbtn" id="ipBtn" title="Скопировать IP"></button></div>
+  </div>
+
+  <section id="about">
+    <div class="sec-head rv"><span class="k">О сервере</span><h2>Город, в котором у каждого своя роль</h2><p>RockFord строится вокруг игры от лица персонажа. Здесь важны история, поступки и отношения между игроками.</p></div>
+    <div class="grid4">
+      <div class="card c-wide rv"><span class="k">Профессии и организации</span><h3>Ремесло, торговля и служба</h3><p>Стража, лекари, кузнецы, купцы и трактирщики. У каждого занятия свои задачи, заработок и путь наверх.</p></div>
+      <div class="card c-narrow rv d1"><span class="k">Экономика</span><h3>Деньги зарабатываются</h3><p>Игровая валюта, налоги и цены, которые формируют сами игроки. Снимать и вносить деньги можно в банкоматах.</p></div>
+      <div class="card c-narrow rv"><span class="k">Недвижимость</span><h3>Свой дом</h3><p>Покупайте дом, обустраивайте его по-своему и открывайте в нём своё дело.</p></div>
+      <div class="card c-wide rv d1"><span class="k">Сюжеты</span><h3>События от администрации</h3><p>Расследования, ярмарки, турниры и истории, которые меняют жизнь города. Ваш персонаж может стать их частью.</p></div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="sec-head rv"><span class="k">Как начать</span><h2>Вход по whitelist</h2><p>На сервер можно зайти только после одобрения заявки. Это защищает игру от случайных людей и нарушителей.</p></div>
+    <div class="steps">
+      <div class="step rv"><span class="n">ШАГ 1</span><h3>Зайдите в Discord</h3><p>Присоединитесь к нашему серверу по ссылке в разделе «Контакты».</p></div>
+      <div class="step rv d1"><span class="n">ШАГ 2</span><h3>Подайте заявку</h3><p>Заполните анкету в канале заявок и укажите игровой ник.</p></div>
+      <div class="step rv d2"><span class="n">ШАГ 3</span><h3>Дождитесь одобрения</h3><p>Администрация рассмотрит заявку и добавит ник в whitelist.</p></div>
+      <div class="step rv d3"><span class="n">ШАГ 4</span><h3>Заходите в игру</h3><p>Minecraft Java 1.21.11, адрес сервера выше. Создайте персонажа и найдите ремесло или службу.</p></div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="sec-head rv"><span class="k">Правила</span><h2>Основы ролевой игры</h2><p>Краткая выжимка. Полный свод правил выдаётся при регистрации в игре.</p></div>
+    <div class="rv">
+      <details open><summary>Играйте за персонажа<span class="term">NonRP</span></summary><div class="body">Поведение должно соответствовать роли и эпохе. Действия, которые невозможны или нелогичны для вашего персонажа в этом мире, считаются нарушением.</div></details>
+      <details><summary>Реагируйте на угрозу<span class="term">FearRP</span></summary><div class="body">Если вам угрожают оружием или силой, персонаж должен вести себя так, как повёл бы себя человек в опасности: не геройствовать и не игнорировать происходящее.</div></details>
+      <details><summary>Разделяйте знания<span class="term">MetaGaming</span></summary><div class="body">Информация из голосовых чатов, Telegram и других источников вне игры не может использоваться персонажем, если он не мог узнать её сам.</div></details>
+      <details><summary>Не навязывайте результат<span class="term">PowerGaming</span></summary><div class="body">Описывайте попытку действия и оставляйте партнёру возможность ответить. Нельзя заранее решать за другого игрока, чем закончится сцена.</div></details>
+      <details><summary>Без бессмысленного насилия<span class="term">DM</span></summary><div class="body">Убийство и нападение допустимы только при наличии сюжетной причины и отыгрыша. Нападение без причины наказывается.</div></details>
+      <details><summary>Уважайте игроков</summary><div class="body">Оскорбления, дискриминация и травля запрещены. Конфликты персонажей остаются в игре, а между игроками решаются спокойно.</div></details>
+    </div>
+  </section>
+
+  <section id="donate">
+    <div class="sec-head rv"><span class="k">Донат</span><h2>Поддержите сервер</h2><p>Привилегии не ломают баланс и не отменяют правила. Деньги идут на оплату хостинга и развитие проекта. Выберите удобную валюту.</p></div>
+    <div class="cur rv" id="cur" role="group" aria-label="Валюта"></div>
+    <div class="donate">
+      <div class="tiers rv" id="tiers" role="group" aria-label="Выбор привилегии"></div>
+      <form class="pay rv d1" id="payForm" novalidate>
+        <h3>Оформление заказа</h3>
+        <p class="note">Ник должен быть одобрен в whitelist через Discord.</p>
+        <label for="nick">Игровой ник
+          <input type="text" id="nick" name="nick" maxlength="16" autocomplete="off" placeholder="Например, Steve_Rock">
+        </label>
+        <label for="method">Способ оплаты
+          <select id="method"></select>
+        </label>
+        <div class="sum"><span>Выбрано: <span id="sumName">—</span></span><b id="sumPrice">0 ₽</b></div>
+        <div class="note" id="curNote" style="min-height:0"></div>
+        <label class="chk" for="agree"><input type="checkbox" id="agree"><span>Я принимаю <button type="button" data-doc="terms">пользовательское соглашение</button> и <button type="button" data-doc="privacy">политику конфиденциальности</button></span></label>
+        <button class="btn primary" type="submit">Перейти к оплате</button>
+        <div class="note" id="payNote" role="status" aria-live="polite"></div>
+        <div class="methods" id="methodPills"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="docs">
+    <div class="sec-head rv"><span class="k">Документы</span><h2>Документы и тарифы</h2><p>Все документы доступны на этой странице в любое время.</p></div>
+    <div class="rv">
+      <div class="dtabs" role="tablist" aria-label="Документы">
+        <button class="dtab" role="tab" id="t-privacy" data-doc="privacy" aria-selected="true">Политика конфиденциальности</button>
+        <button class="dtab" role="tab" id="t-terms" data-doc="terms" aria-selected="false">Пользовательское соглашение</button>
+        <button class="dtab" role="tab" id="t-prices" data-doc="prices" aria-selected="false">Цены и тарифы</button>
+      </div>
+      <div class="doc" id="docBody" role="tabpanel" tabindex="0"></div>
+    </div>
+  </section>
+
+  <section id="contacts">
+    <div class="sec-head rv"><span class="k">Контакты</span><h2>Поддержка и связь</h2><p>По вопросам оплаты, привилегий и работы сайта пишите на почту. Заявки на whitelist рассматриваются в Discord.</p></div>
+    <div class="contacts">
+      <div class="ct rv"><span class="k">Почта: идеи и помощь</span><div class="val" id="cMail"></div><button class="copy" data-copy="mail">Скопировать</button></div>
+      <div class="ct rv d1"><span class="k">Discord</span><div class="val">Заявки на whitelist и поддержка</div><a class="copy" id="cDiscord" style="text-decoration:none;justify-self:start" href="#" target="_blank" rel="noopener">Открыть Discord</a></div>
+      <div class="ct rv d2"><span class="k">Telegram</span><div class="val">Новости сервера</div><a class="copy" id="cTg" style="text-decoration:none;justify-self:start" href="#" target="_blank" rel="noopener">Открыть канал</a></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="flinks"><button data-doc="privacy">Политика конфиденциальности</button><button data-doc="terms">Пользовательское соглашение</button><button data-doc="prices">Цены и тарифы</button></div>
+    <div>© 2026 RockFord Roleplay. Проект не является официальным продуктом Mojang AB или Microsoft и не связан с ними. Minecraft — товарный знак Mojang AB.</div>
+    <div class="verify">Платега тест</div>
+  </footer>
+</main>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== Настройки: замените значения на свои ===== */
+var CONFIG = {
+  ip: 'rockford.gomc.fun',
+  supportMail: 'rockfordroleplay@gmail.com',
+  discord: 'https://discord.gg/yeTdxbP4yN',
+  tg: 'https://t.me/mcrockfordnews',
+  docsDate: '8 октября 2026 г.',
+  currencies: [
+    {code:'RUB',sym:'₽',name:'Рубли'},
+    {code:'BYN',sym:'Br',name:'Белорусские рубли'},
+    {code:'USD',sym:'$',name:'Доллары'},
+    {code:'EUR',sym:'€',name:'Евро'},
+    {code:'UAH',sym:'₴',name:'Гривны'},
+    {code:'KZT',sym:'₸',name:'Тенге'},
+    {code:'UZS',sym:'сум',name:'Узбекские сумы'},
+    {code:'AED',sym:'AED',name:'Дирхамы ОАЭ'},
+    {code:'TRY',sym:'₺',name:'Турецкие лиры'},
+    {code:'PLN',sym:'zł',name:'Злотые'},
+    {code:'GBP',sym:'£',name:'Фунты'}
+  ],
+  methods: [
+    {id:'sbp',name:'СБП (QR-код или ссылка из банковского приложения)',short:'СБП',only:'RUB'},
+    {id:'card',name:'Банковская карта',short:'Банковская карта',only:null},
+    {id:'crypto',name:'Криптовалюта',short:'Криптовалюта',only:null}
+  ],
+  tiers: [
+    {id:'townsman', name:'Горожанин', price:{RUB:199,BYN:8,USD:2.5,EUR:2.3,UAH:100,KZT:1300,UZS:31000,AED:9,TRY:105,PLN:9.5,GBP:1.9}, perks:['Цветной ник в чате','Приоритет входа при полном сервере','Дополнительная точка дома']},
+    {id:'craftsman', name:'Ремесленник', price:{RUB:399,BYN:15,USD:5,EUR:4.6,UAH:200,KZT:2600,UZS:62000,AED:18,TRY:210,PLN:19,GBP:3.8}, perks:['Всё из «Горожанин»','Ещё два слота для имущества','Особый значок в списке игроков']},
+    {id:'merchant', name:'Купец', price:{RUB:699,BYN:26,USD:8.5,EUR:8,UAH:350,KZT:4400,UZS:106000,AED:31,TRY:360,PLN:32,GBP:6.5}, perks:['Всё из «Ремесленник»','Дополнительная лицензия на торговлю','Ранний доступ к новым профессиям']},
+    {id:'lord', name:'Лорд', price:{RUB:1199,BYN:45,USD:15,EUR:13.5,UAH:600,KZT:7800,UZS:190000,AED:55,TRY:630,PLN:57,GBP:11.5}, perks:['Всё из «Купец»','Уникальный префикс','Приоритетная поддержка']}
+  ]
+};
+
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var CUR=CONFIG.currencies,cur='RUB';
+  function curOf(c){return CUR.filter(function(x){return x.code===c})[0]}
+  function fmt(t,c){var x=curOf(c||cur);return t.price[x.code].toLocaleString('ru-RU',{maximumFractionDigits:2})+' '+x.sym}
+  function mOf(id){return CONFIG.methods.filter(function(x){return x.id===id})[0]}
+  function effCur(){var m=document.getElementById('method');var mm=m&&mOf(m.value);return mm&&mm.only?mm.only:cur}
+  function allPrices(t){return CUR.map(function(x){return fmt(t,x.code)}).join(' · ')}
+  var toastEl=$('#toast'),tt;
+  function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('on')},2200)}
+  function copy(text,el){
+    var done=function(){toast('Скопировано')};
+    try{navigator.clipboard.writeText(text).then(done,function(){fallback()})}catch(e){fallback()}
+    function fallback(){
+      var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);
+      toast('Выделено, нажмите «Копировать»');
+    }
+  }
+
+  /* навигация */
+  function go(id){
+    var el=id==='top'?document.body:document.getElementById(id);
+    if(!el)return;
+    var y=id==='top'?0:el.getBoundingClientRect().top+scrollY-70;
+    scrollTo({top:y,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+  }
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('[data-go]');
+    if(g){e.preventDefault();go(g.getAttribute('data-go'))}
+  });
+
+  /* IP и контакты */
+  $('#ipBtn').textContent=CONFIG.ip;
+  $('#ipBtn').addEventListener('click',function(){copy(CONFIG.ip,this)});
+  $('#cMail').textContent=CONFIG.supportMail;
+  $('#cTg').href=CONFIG.tg;$('#cDiscord').href=CONFIG.discord;$('#heroDiscord').href=CONFIG.discord;
+  $$('[data-copy]').forEach(function(b){b.addEventListener('click',function(){copy($('#cMail').textContent,$('#cMail'))})});
+
+  /* онлайн сервера */
+  function loadOnline(){
+    var dot=$('#onDot'),txt=$('#onText');
+    try{
+      fetch('https://api.mcsrvstat.us/3/'+encodeURIComponent(CONFIG.ip)).then(function(r){return r.json()}).then(function(d){
+        if(d&&d.online){dot.style.background='var(--ok)';dot.style.animation='';txt.textContent=(d.players?d.players.online:0)+' / '+(d.players?d.players.max:'?')}
+        else{dot.style.background='#ff7a7a';dot.style.animation='none';txt.textContent='Оффлайн'}
+      }).catch(function(){})
+    }catch(e){}
+  }
+  loadOnline();setInterval(loadOnline,60000);
+
+  /* донат */
+  var sel=CONFIG.tiers[1];
+  var tiersEl=$('#tiers');
+  CONFIG.tiers.forEach(function(t){
+    var b=document.createElement('button');
+    b.type='button';b.className='tier';b.setAttribute('data-id',t.id);b.setAttribute('aria-pressed',t===sel?'true':'false');
+    b.innerHTML='<span class="name"></span><span class="price"></span><ul></ul>';
+    $('.name',b).textContent=t.name;
+    b._t=t;b._p=$('.price',b);
+    t.perks.forEach(function(p){var li=document.createElement('li');li.textContent=p;$('ul',b).appendChild(li)});
+    b.addEventListener('click',function(){sel=t;update()});
+    tiersEl.appendChild(b);
+  });
+  var mSel=$('#method'),mP=$('#methodPills');
+  CONFIG.methods.forEach(function(m){
+    var o=document.createElement('option');o.value=m.id;o.textContent=m.name;mSel.appendChild(o);
+    var p=document.createElement('span');p.className='pill';p.textContent=m.short;mP.appendChild(p);
+  });
+  var curEl=$('#cur');
+  CUR.forEach(function(x){
+    var b=document.createElement('button');b.type='button';b.className='curb';b.textContent=x.sym+' '+x.name;
+    b.setAttribute('data-c',x.code);b.setAttribute('aria-pressed',x.code===cur?'true':'false');
+    b.addEventListener('click',function(){cur=x.code;update()});curEl.appendChild(b);
+  });
+  function update(){
+    var ec=effCur();
+    $$('.tier').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-id')===sel.id?'true':'false');b._p.innerHTML=fmt(b._t,cur)+' <small>навсегда</small>'});
+    $$('.curb').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-c')===cur?'true':'false')});
+    $('#sumName').textContent=sel.name;$('#sumPrice').textContent=fmt(sel,ec);
+    $('#curNote').textContent=ec!==cur?'Этот способ оплаты принимает только валюту «'+curOf(ec).name+'», поэтому сумма указана в ней.':'';
+  }
+  $('#method').addEventListener('change',update);
+  update();
+  $('#payForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=$('#payNote'),nick=$('#nick').value.trim();
+    n.className='note';
+    if(!/^[A-Za-z0-9_]{3,16}$/.test(nick)){n.classList.add('err');n.textContent='Введите ник из 3–16 символов: латинские буквы, цифры и «_».';$('#nick').focus();return}
+    if(!$('#agree').checked){n.classList.add('err');n.textContent='Подтвердите согласие с документами, чтобы продолжить.';return}
+    n.classList.add('ok');
+    n.textContent='Заказ собран: '+sel.name+' для '+nick+', '+fmt(sel,effCur())+'. Приём платежей запускается после подключения кассы. Следите за новостями в канале.';
+  });
+
+  /* документы */
+  var D=CONFIG.docsDate;
+  var DOCS={
+    privacy:'<span class="date">Действует с '+D+'</span><h3>Политика конфиденциальности</h3><p>Настоящая политика описывает, какие данные собирает игровой проект RockFord Roleplay (далее — «Проект») и как они используются.</p>'+
+      '<h4>1. Какие данные мы получаем</h4><ul><li>Игровой ник и внутриигровой идентификатор (UUID).</li><li>IP-адрес и время подключения к серверу, нужные для защиты от злоупотреблений.</li><li>Сведения о покупках на сайте: выбранная привилегия, сумма, дата и статус оплаты.</li><li>Контакты, которые вы сами указали при обращении в поддержку.</li></ul>'+
+      '<h4>2. Платёжные данные</h4><p>Проект не получает и не хранит данные банковских карт и реквизиты счетов. Оплата проходит на стороне платёжного сервиса, а Проект получает только уведомление о результате платежа.</p>'+
+      '<h4>3. Зачем мы используем данные</h4><ul><li>Выдача купленных привилегий.</li><li>Работа сервера, защита от читов и нарушений правил.</li><li>Ответы на обращения в поддержку.</li></ul>'+
+      '<h4>4. Передача третьим лицам</h4><p>Мы не продаём данные. Они могут передаваться платёжному сервису в объёме, необходимом для проведения оплаты, а также по требованию закона.</p>'+
+      '<h4>5. Хранение и защита</h4><p>Данные хранятся столько, сколько нужно для целей выше, и защищаются доступом только для администрации Проекта.</p>'+
+      '<h4>6. Ваши права</h4><p>Вы можете запросить сведения о хранимых данных, их исправление или удаление, написав в поддержку по адресу из раздела «Контакты».</p>'+
+      '<h4>7. Изменения</h4><p>Актуальная версия всегда размещена на этой странице. Дата вступления в силу указана вверху документа.</p>',
+    terms:'<span class="date">Действует с '+D+'</span><h3>Пользовательское соглашение</h3><p>Соглашение регулирует использование сайта и игрового сервера RockFord Roleplay (далее — «Проект»). Начиная пользоваться Проектом или оплачивая услуги, вы принимаете его условия.</p>'+
+      '<h4>1. Предмет</h4><p>Проект предоставляет доступ к игровому серверу Minecraft и возможность приобрести внутриигровые привилегии и предметы (далее — «Услуги»). Услуги носят цифровой характер и действуют только внутри Проекта.</p>'+
+      '<h4>2. Правила сервера</h4><p>Доступ к серверу предоставляется по whitelist: заявка рассматривается администрацией в Discord. Пользователь обязуется соблюдать правила сервера. Наличие привилегии не освобождает от ответственности за их нарушение. За нарушения администрация вправе ограничить доступ, в том числе без возврата средств за неиспользованные Услуги.</p>'+
+      '<h4>3. Покупки и оплата</h4><p>Актуальные цены и состав Услуг указаны в разделе «Цены и тарифы». Цены указаны в нескольких валютах (полный список в разделе «Цены и тарифы»). Способы оплаты: СБП (только рубли), банковская карта и криптовалюта. Услуга выдаётся на указанный при оформлении игровой ник, поэтому проверяйте его перед оплатой.</p>'+
+      '<h4>4. Возврат</h4><p>Оплаченная Услуга, уже выданная на ваш аккаунт, возврату не подлежит, за исключением случаев, предусмотренных законом. Если Услуга не была выдана в течение 24 часов после оплаты, напишите в поддержку и мы выдадим её или вернём средства.</p>'+
+      '<h4>5. Ответственность</h4><p>Проект предоставляется «как есть». Администрация может изменять игровой процесс, баланс и состав привилегий, сохраняя оплаченные пользователем возможности по существу.</p>'+
+      '<h4>6. Интеллектуальная собственность</h4><p>Проект не является официальным продуктом Mojang AB или Microsoft. Minecraft — товарный знак Mojang AB.</p>'+
+      '<h4>7. Связь</h4><p>Вопросы по соглашению направляйте в поддержку из раздела «Контакты».</p>',
+    prices:'<span class="date">Актуально на '+D+'</span><h3>Цены и тарифы</h3><p>Цены указаны в нескольких валютах. Они включают всё, что вы оплачиваете. Скрытых доплат нет.</p><div class="tblwrap"><table class="tbl"><thead><tr><th>Услуга</th><th>Что входит</th><th>Цена</th></tr></thead><tbody>'
+  };
+  DOCS.prices+=CONFIG.tiers.map(function(t){return '<tr><td>'+t.name+'</td><td>'+t.perks.join('; ')+'. Срок: навсегда.</td><td>'+allPrices(t)+'</td></tr>'}).join('')+'</tbody></table></div><p style="margin-top:14px">Способы оплаты: СБП (QR-код или ссылка из банковского приложения), банковская карта и криптовалюта. СБП принимает только рубли, криптовалютой можно оплатить в эквиваленте любой из указанных валют.</p>';
+
+  function showDoc(k,scroll){
+    $('#docBody').innerHTML=DOCS[k];
+    $$('.dtab').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-doc')===k?'true':'false')});
+    $('#docBody').setAttribute('aria-labelledby','t-'+k);
+    $('#docBody').scrollTop=0;
+    if(scroll)go('docs');
+  }
+  $$('.dtab').forEach(function(b){b.addEventListener('click',function(){showDoc(b.getAttribute('data-doc'))})});
+  $$('.chk [data-doc],.flinks [data-doc]').forEach(function(b){b.addEventListener('click',function(){showDoc(b.getAttribute('data-doc'),true)})});
+  showDoc('privacy');
+
+  /* скролл: прогресс, активная вкладка, параллакс */
+  var ids=['top','about','start','rules','donate','docs','contacts'];
+  var tabs=$$('#tabs .tab'),bar=$('#bar'),R=$('#bigR');
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function onScroll(){
+    var h=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(h>0?scrollY/h*100:0)+'%';
+    var cur='top';
+    ids.forEach(function(id){var el=id==='top'?null:document.getElementById(id);if(el&&el.getBoundingClientRect().top<innerHeight*0.4)cur=id});
+    tabs.forEach(function(t){t.setAttribute('aria-current',t.getAttribute('data-go')===cur?'true':'false')});
+    var active=tabs.filter(function(t){return t.getAttribute('aria-current')==='true'})[0];
+    if(active&&active.scrollIntoView&&!onScroll.k){var p=active.parentNode;p.scrollTo({left:active.offsetLeft-p.clientWidth/2+active.clientWidth/2,behavior:'auto'})}
+    if(!reduce&&R){var y=Math.min(scrollY,700);R.style.transform='translateY('+(y*0.12)+'px) rotate('+(y*0.01)+'deg) scale('+(1-y*0.0002)+')'}
+  }
+  addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);onScroll();
+
+  /* появление при прокрутке */
+  var rv=$$('.rv');
+  if('IntersectionObserver' in window&&!reduce){
+    rv.forEach(function(el){if(el.getBoundingClientRect().top>innerHeight)el.classList.add('pre')});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    rv.forEach(function(el){io.observe(el)});
+  }
+})();
+</script>
+
+</html>
