@@ -159,8 +159,8 @@ details .body{padding:0 4px 24px;color:var(--mute);max-width:70ch}
 .pay{position:sticky;top:84px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:16px;min-width:0}
 .pay h3{font-size:18px}
 label{display:grid;gap:6px;font:500 13px var(--body);color:var(--mute)}
-input[type=text],select{width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:500 15px var(--body)}
-input[type=text]:focus,select:focus{outline:2px solid var(--silver);outline-offset:1px}
+input[type=text],input[type=email],input[type=password],input[type=number],select{width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:500 15px var(--body)}
+input[type=text]:focus,input[type=email]:focus,input[type=password]:focus,input[type=number]:focus,select:focus{outline:2px solid var(--silver);outline-offset:1px}
 .sum{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px dashed var(--line);padding-top:14px}
 .sum b{font:800 24px var(--display)}
 .chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--mute)}
@@ -201,6 +201,31 @@ input[type=text]:focus,select:focus{outline:2px solid var(--silver);outline-offs
 .copy{appearance:none;font:600 13px var(--body);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer}
 .copy:hover{border-color:var(--line-hi)}
 
+/* личный кабинет */
+[hidden]{display:none!important}
+.authbox{max-width:480px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:18px;min-width:0}
+.authbox form{display:grid;gap:14px}
+.authbox .dtabs{margin:0}
+.linkbtn{all:unset;cursor:pointer;color:var(--mute);text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.linkbtn:hover{color:var(--fg)}
+.linkbtn:focus-visible{outline:2px solid var(--silver);outline-offset:3px}
+.cabtop{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.cabtop .v{margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:24px;min-width:0}
+.stat .num{font:800 clamp(24px,4vw,34px) var(--display);margin-top:10px;overflow-wrap:anywhere}
+.cabgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.cabgrid .card{display:grid;gap:14px;align-content:start}
+.cabgrid .card:hover,.histcard:hover{transform:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.code{font:600 24px var(--mono);letter-spacing:.14em;overflow-wrap:anywhere}
+.amt{font-weight:600;white-space:nowrap}
+.amt.pos{color:var(--ok)}
+.histcard .tbl td:last-child{min-width:0;text-align:right}
+.histcard .tbl th:last-child{text-align:right}
+.note.demo{border:1px dashed var(--line-hi);border-radius:12px;padding:12px 16px;margin-bottom:16px;min-height:0}
+
 footer{margin-top:120px;border-top:1px solid var(--line);padding-block:36px 48px;display:grid;gap:14px;color:var(--mute);font-size:13px}
 .flinks{display:flex;gap:18px;flex-wrap:wrap}
 .flinks button{all:unset;cursor:pointer;color:var(--fg);text-decoration:underline;text-underline-offset:3px}
@@ -225,6 +250,7 @@ footer{margin-top:120px;border-top:1px solid var(--line);padding-block:36px 48px
   .donate{grid-template-columns:1fr}
   .pay{position:static}
   .contacts{grid-template-columns:1fr}
+  .stats,.cabgrid{grid-template-columns:1fr}
   .c-wide,.c-narrow,.c-half{grid-column:span 12}
   .brand b{display:none}
   .nav{gap:8px}
@@ -255,6 +281,7 @@ footer{margin-top:120px;border-top:1px solid var(--line);padding-block:36px 48px
       <button class="tab" data-go="start">Как начать</button>
       <button class="tab" data-go="rules">Правила</button>
       <button class="tab" data-go="donate">Донат</button>
+      <button class="tab" data-go="cabinet">Кабинет</button>
       <button class="tab" data-go="docs">Документы</button>
       <button class="tab" data-go="contacts">Контакты</button>
     </nav>
@@ -365,6 +392,70 @@ footer{margin-top:120px;border-top:1px solid var(--line);padding-block:36px 48px
     </div>
   </section>
 
+  <section id="cabinet">
+    <div class="sec-head rv"><span class="k">Личный кабинет</span><h2>Баланс и история донатов</h2><p>Зарегистрируйтесь по почте, чтобы пополнять баланс сайта, покупать привилегии с него и видеть все свои платежи.</p></div>
+    <div class="note demo" id="cabDemo" hidden></div>
+
+    <div class="authbox rv" id="cabAuth">
+      <div class="dtabs" id="atabs" role="tablist" aria-label="Вход и регистрация">
+        <button class="dtab" type="button" role="tab" data-atab="login" aria-selected="true">Вход</button>
+        <button class="dtab" type="button" role="tab" data-atab="signup" aria-selected="false">Регистрация</button>
+      </div>
+      <form id="fLogin" novalidate>
+        <label for="liEmail">Почта<input type="email" id="liEmail" autocomplete="email" placeholder="you@example.com"></label>
+        <label for="liPass">Пароль<input type="password" id="liPass" autocomplete="current-password"></label>
+        <button class="btn primary" type="submit">Войти</button>
+        <button class="linkbtn" type="button" id="forgot">Забыли пароль?</button>
+      </form>
+      <form id="fSignup" hidden novalidate>
+        <label for="suNick">Игровой ник<input type="text" id="suNick" maxlength="16" autocomplete="username" placeholder="Steve_Rock"></label>
+        <label for="suEmail">Почта<input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com"></label>
+        <label for="suPass">Пароль, не короче 8 символов<input type="password" id="suPass" autocomplete="new-password"></label>
+        <label class="chk" for="suAgree"><input type="checkbox" id="suAgree"><span>Я принимаю <button type="button" data-doc="terms">пользовательское соглашение</button> и <button type="button" data-doc="privacy">политику конфиденциальности</button></span></label>
+        <button class="btn primary" type="submit">Создать аккаунт</button>
+        <p class="note" style="min-height:0">После регистрации мы отправим письмо со ссылкой для подтверждения почты.</p>
+      </form>
+      <form id="fNewpass" hidden novalidate>
+        <label for="npPass">Новый пароль, не короче 8 символов<input type="password" id="npPass" autocomplete="new-password"></label>
+        <button class="btn primary" type="submit">Сохранить пароль</button>
+      </form>
+      <div class="note" id="authNote" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="cabMain" hidden>
+      <div class="cabtop">
+        <div><span class="k">Аккаунт</span><div class="v" id="cbNick">—</div><div class="note" id="cbEmail" style="min-height:0"></div></div>
+        <button class="btn" type="button" id="logout">Выйти</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="k">Баланс сайта</span><div class="num" id="stBal">0 ₽</div></div>
+        <div class="stat"><span class="k">Всего задонатили</span><div class="num" id="stTot">0 ₽</div></div>
+        <div class="stat"><span class="k">Высший статус</span><div class="num" id="stTier">Нет</div></div>
+      </div>
+      <div class="cabgrid">
+        <form class="card" id="fTop" novalidate>
+          <h3>Пополнить баланс</h3>
+          <p>Пополнение в рублях. Способ оплаты (СБП или криптовалюта) выберете на странице платежа.</p>
+          <div class="chips" id="chips" role="group" aria-label="Быстрый выбор суммы"></div>
+          <label for="tpAmt">Сумма, ₽<input type="number" id="tpAmt" min="100" max="50000" step="1" inputmode="numeric" value="500"></label>
+          <button class="btn primary" type="submit">Пополнить</button>
+          <div class="note" id="topNote" role="status" aria-live="polite" style="min-height:0"></div>
+        </form>
+        <div class="card">
+          <h3>Привязка к игре</h3>
+          <p>Код нужен, чтобы сервер узнал ваш аккаунт. Не передавайте его другим игрокам.</p>
+          <div class="code" id="cbCode">—</div>
+          <div class="row"><button class="copy" type="button" id="copyCode">Скопировать</button><button class="copy" type="button" id="regenCode">Новый код</button></div>
+          <p class="note" style="min-height:0">Купить привилегию с баланса можно в разделе «Донат», выбрав способ «Баланс сайта».</p>
+        </div>
+      </div>
+      <div class="card histcard">
+        <h3>История платежей</h3>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th></tr></thead><tbody id="hist"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
   <section id="docs">
     <div class="sec-head rv"><span class="k">Документы</span><h2>Документы и тарифы</h2><p>Все документы доступны на этой странице в любое время.</p></div>
     <div class="rv">
@@ -403,6 +494,13 @@ var CONFIG = {
   discord: 'https://discord.gg/yeTdxbP4yN',
   tg: 'https://t.me/mcrockfordnews',
   docsDate: '12 октября 2026 г.',
+  /* Личный кабинет: вставьте адрес проекта и публичный (anon) ключ из Supabase, см. SETUP.md.
+     Пока поля пустые, кабинет работает в демонстрационном режиме. Секретные ключи сюда не вставляйте. */
+  supabaseUrl: '',
+  supabaseKey: '',
+  topupFn: 'create-topup',
+  topupMin: 100,
+  topupMax: 50000,
   currencies: [
     {code:'RUB',sym:'₽',name:'Рубли'},
     {code:'BYN',sym:'Br',name:'Белорусские рубли'},
@@ -418,7 +516,8 @@ var CONFIG = {
   ],
   methods: [
     {id:'sbp',name:'СБП (QR-код или ссылка из банковского приложения)',short:'СБП',only:'RUB'},
-    {id:'crypto',name:'Криптовалюта',short:'Криптовалюта',only:null}
+    {id:'crypto',name:'Криптовалюта',short:'Криптовалюта',only:null},
+    {id:'balance',name:'Баланс сайта (нужен личный кабинет)',short:'Баланс сайта',only:'RUB'}
   ],
   tiers: [
     {id:'townsman', name:'Горожанин', price:{RUB:199,BYN:8,USD:2.5,EUR:2.3,UAH:100,KZT:1300,UZS:31000,AED:9,TRY:105,PLN:9.5,GBP:1.9}, perks:['Цветной ник в чате','Приоритет входа при полном сервере','Дополнительная точка дома']},
@@ -471,6 +570,8 @@ var CONFIG = {
     var g=e.target.closest('[data-go]');
     if(g){e.preventDefault();go(g.getAttribute('data-go'))}
   });
+
+  window.RF={toast:toast,go:go};
 
   /* IP и контакты */
   $('#ipBtn').textContent=CONFIG.ip;
@@ -528,6 +629,13 @@ var CONFIG = {
     e.preventDefault();
     var n=$('#payNote'),nick=$('#nick').value.trim();
     n.className='note';
+    if($('#method').value==='balance'){
+      if(!$('#agree').checked){n.classList.add('err');n.textContent='Подтвердите согласие с документами, чтобы продолжить.';return}
+      if(!window.RFCab||!window.RFCab.user()){n.classList.add('err');n.textContent='Войдите в личный кабинет, чтобы оплатить с баланса.';go('cabinet');return}
+      n.textContent='Проверяем баланс…';
+      window.RFCab.buy(sel).then(function(r){n.className='note '+(r.ok?'ok':'err');n.textContent=r.msg});
+      return;
+    }
     if(!/^[A-Za-z0-9_]{3,16}$/.test(nick)){n.classList.add('err');n.textContent='Введите ник из 3–16 символов: латинские буквы, цифры и «_».';$('#nick').focus();return}
     if(!$('#agree').checked){n.classList.add('err');n.textContent='Подтвердите согласие с документами, чтобы продолжить.';return}
     n.classList.add('ok');
@@ -538,22 +646,22 @@ var CONFIG = {
   var D=CONFIG.docsDate;
   var DOCS={
     privacy:'<span class="date">Дата актуальной версии: '+D+'</span><h3>Политика конфиденциальности</h3><p>Настоящая политика регулирует сбор, использование и защиту информации пользователей сервиса RockFord Roleplay: сайта rockford.gomc.fun и игрового сервера Minecraft (далее — «Сервис»).</p>'+
-      '<h4>1. Какая информация собирается</h4><ul><li>Идентификаторы аккаунта: игровой ник, внутриигровой идентификатор (ID) и имя пользователя в Discord или Telegram, если вы указали его при обращении.</li><li>Технические данные: IP-адрес, браузер, устройство и операционная система.</li><li>История взаимодействия с Сервисом: заявки, обращения в поддержку, оформленные заказы.</li></ul>'+
-      '<h4>2. Как используется информация</h4><ul><li>Для работы Сервиса и выдачи оплаченных услуг.</li><li>Для связи с пользователем, включая уведомления и ответы службы поддержки.</li><li>Для анализа и улучшения Сервиса.</li></ul>'+
+      '<h4>1. Какая информация собирается</h4><ul><li>Идентификаторы аккаунта: игровой ник, внутриигровой идентификатор (ID), адрес электронной почты и имя пользователя в Discord или Telegram, если вы указали его при обращении.</li><li>Технические данные: IP-адрес, браузер, устройство и операционная система.</li><li>История взаимодействия с Сервисом: заявки, обращения в поддержку, оформленные заказы, сведения о балансе личного кабинета, пополнениях и покупках.</li></ul>'+
+      '<h4>2. Как используется информация</h4><ul><li>Для работы Сервиса и выдачи оплаченных услуг.</li><li>Для связи с пользователем, включая письма о подтверждении почты и смене пароля, уведомления и ответы службы поддержки.</li><li>Для анализа и улучшения Сервиса.</li></ul>'+
       '<h4>3. Передача информации третьим лицам</h4><p>Информация не передаётся третьим лицам, за исключением случаев, когда это требуется по закону, необходимо для исполнения обязательств перед пользователем (например, для обработки платежа платёжным сервисом) или пользователь дал на это согласие.</p>'+
-      '<h4>4. Хранение и защита</h4><p>Информация хранится только в течение срока, необходимого для целей, указанных выше. Оператор принимает разумные меры для её защиты, но не гарантирует абсолютную безопасность данных.</p>'+
+      '<h4>4. Хранение и защита</h4><p>Информация хранится только в течение срока, необходимого для целей, указанных выше. Оператор принимает разумные меры для её защиты, но не гарантирует абсолютную безопасность данных. Пароль личного кабинета хранится только в защищённом (хешированном) виде, оператор не видит его в открытом виде.</p>'+
       '<h4>5. Платёжные данные</h4><p>Сервис не получает и не хранит реквизиты банковских карт и счетов. Оплата проходит на стороне платёжного сервиса, а Сервис получает только уведомление о её результате.</p>'+
       '<h4>6. Ответственность</h4><p>Оператор не несёт ответственности за утрату, кражу или раскрытие информации по вине третьих лиц или самого пользователя.</p>'+
       '<h4>7. Изменения политики</h4><p>Оператор может изменять настоящую политику. Актуальная версия всегда размещена на этой странице, а продолжение использования Сервиса означает согласие с изменениями.</p>'+
       '<h4>8. Контакты</h4><p>Вопросы по обработке информации отправляйте на почту поддержки: '+CONFIG.supportMail+'.</p>',
     terms:'<span class="date">Дата актуальной версии: '+D+'</span><h3>Пользовательское соглашение</h3><p>Настоящее соглашение регулирует использование сервиса RockFord Roleplay: сайта rockford.gomc.fun и игрового сервера Minecraft (далее — «Сервис»).</p>'+
       '<h4>1. Общие положения</h4><p>Начиная пользоваться Сервисом, подавая заявку на доступ или оплачивая услуги, пользователь принимает условия настоящего соглашения. Если пользователь не согласен с условиями, он должен прекратить использование Сервиса.</p>'+
-      '<h4>2. Характер услуг</h4><p>Сервис предоставляет доступ к игровому серверу и продаёт нематериальные цифровые товары и услуги: внутриигровые привилегии, статусы и предметы. Их ценность состоит в возможностях внутри игры, они не являются материальными товарами и не имеют эквивалента за пределами Сервиса. Доступ к серверу предоставляется по whitelist: заявки рассматривает администрация в Discord.</p>'+
+      '<h4>2. Характер услуг</h4><p>Сервис предоставляет доступ к игровому серверу и продаёт нематериальные цифровые товары и услуги: внутриигровые привилегии, статусы и предметы. Их ценность состоит в возможностях внутри игры, они не являются материальными товарами и не имеют эквивалента за пределами Сервиса. Доступ к серверу предоставляется по whitelist: заявки рассматривает администрация в Discord. Пользователь может завести личный кабинет по адресу электронной почты. Баланс кабинета учитывает предоплаченные средства для оплаты услуг Сервиса, не является банковским счётом или электронными деньгами, не подлежит выводу и передаче другим пользователям.</p>'+
       '<h4>3. Гарантии и ответственность</h4><p>Сервис предоставляется «как есть». Оператор не гарантирует бесперебойную работу, отсутствие технических сбоев и конкретный результат использования привилегий, а также не несёт ответственности за убытки, возникшие из-за действий третьих лиц или использования Сервиса.</p>'+
       '<h4>4. Законное использование</h4><p>Пользователь обязуется соблюдать применимое законодательство, правила сервера и правила сторонних платформ, а также самостоятельно отвечает за законность своих действий в Сервисе.</p>'+
       '<h4>5. Интеллектуальная собственность</h4><p>Материалы, оформление и контент Сервиса защищены. Копировать, распространять, перепродавать и передавать их без разрешения правообладателя запрещено. Minecraft является товарным знаком Mojang AB, Сервис не связан с Mojang AB и Microsoft.</p>'+
       '<h4>6. Ограничение доступа</h4><p>Оператор вправе приостановить или ограничить доступ пользователя при нарушении правил, подозрении на злоупотребление, по требованию закона или платёжного сервиса.</p>'+
-      '<h4>7. Оплата и возврат</h4><p>Актуальные цены и состав услуг указаны в разделе «Цены и тарифы». Услуга выдаётся на игровой ник, указанный при оформлении, поэтому проверяйте его перед оплатой. После предоставления доступа к оплаченной услуге возврат средств, как правило, не производится.</p><p>Исключения: услуга не была предоставлена из-за технической ошибки или доступ фактически не был получен. В этом случае нужно написать в поддержку в течение 24 часов после оплаты, а решение о возврате принимается индивидуально. Пользователь обязуется не инициировать возврат платежа (чарджбэк) через банк, не обратившись предварительно в поддержку.</p>'+
+      '<h4>7. Оплата и возврат</h4><p>Актуальные цены и состав услуг указаны в разделе «Цены и тарифы». Услуга выдаётся на игровой ник, указанный при оформлении, поэтому проверяйте его перед оплатой. После предоставления доступа к оплаченной услуге возврат средств, как правило, не производится.</p><p>Исключения: услуга не была предоставлена из-за технической ошибки или доступ фактически не был получен. В этом случае нужно написать в поддержку в течение 24 часов после оплаты, а решение о возврате принимается индивидуально. Пользователь обязуется не инициировать возврат платежа (чарджбэк) через банк, не обратившись предварительно в поддержку. Порядок возврата неизрасходованного остатка баланса личного кабинета определяется по обращению в поддержку.</p>'+
       '<h4>8. Конфиденциальность</h4><p>Оператор может собирать минимальные технические данные, необходимые для работы Сервиса, и не гарантирует абсолютную безопасность информации. Подробнее в Политике конфиденциальности.</p>'+
       '<h4>9. Изменения соглашения</h4><p>Оператор вправе изменять настоящее соглашение. Актуальная версия размещена на этой странице, а продолжение использования Сервиса означает согласие с изменениями.</p>'+
       '<h4>10. Контакты</h4><p>Поддержка: '+CONFIG.supportMail+'. Заявки на доступ и вопросы по игре принимаются в Discord сервера.</p>',
@@ -573,7 +681,7 @@ var CONFIG = {
   showDoc('privacy');
 
   /* скролл: прогресс, активная вкладка, параллакс */
-  var ids=['top','about','start','rules','donate','docs','contacts'];
+  var ids=['top','about','start','rules','donate','cabinet','docs','contacts'];
   var tabs=$$('#tabs .tab'),bar=$('#bar'),R=$('#bigR');
   var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   function onScroll(){
@@ -595,6 +703,236 @@ var CONFIG = {
     var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
     rv.forEach(function(el){io.observe(el)});
   }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* Личный кабинет: с Supabase, если заданы supabaseUrl и supabaseKey, иначе демонстрационный режим в браузере */
+(function(){
+  var C=CONFIG,RF=window.RF,toast=RF.toast;
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var NICK=/^[A-Za-z0-9_]{3,16}$/,MAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var configured=!!(C.supabaseUrl&&C.supabaseKey);
+  var live=configured&&!!window.supabase;
+  var sb=live?window.supabase.createClient(C.supabaseUrl,C.supabaseKey):null;
+  var S={user:null,profile:null,tx:[]};
+  var redirect=location.origin+location.pathname;
+
+  function rub(k){return (k/100).toLocaleString('ru-RU',{maximumFractionDigits:2})+' ₽'}
+  function say(el,msg,kind){el.className='note'+(kind?' '+kind:'');el.textContent=msg||''}
+  function errText(e){
+    var m=((e&&e.message)||'').toLowerCase();
+    if(m.indexOf('invalid login')>-1)return 'Неверная почта или пароль.';
+    if(m.indexOf('not confirmed')>-1)return 'Почта не подтверждена. Откройте письмо, которое мы отправили при регистрации.';
+    if(m.indexOf('already registered')>-1)return 'Эта почта уже зарегистрирована. Войдите или восстановите пароль.';
+    if(m.indexOf('rate limit')>-1||m.indexOf('too many')>-1)return 'Слишком много попыток. Попробуйте позже.';
+    if(m.indexOf('password')>-1)return 'Пароль не подходит: используйте не меньше 8 символов.';
+    return 'Не удалось выполнить запрос. Попробуйте ещё раз.';
+  }
+  function busy(form,on){$$('button[type=submit]',form).forEach(function(b){b.disabled=on})}
+
+  /* ---------- данные ---------- */
+  var api={};
+  if(live){
+    api.init=async function(){
+      var r=await sb.auth.getSession();S.user=r.data.session?r.data.session.user:null;
+      sb.auth.onAuthStateChange(function(ev,s){
+        S.user=s?s.user:null;
+        setTimeout(function(){
+          if(ev==='PASSWORD_RECOVERY'){showForm('newpass');render(true)}
+          else if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'){render()}
+        },0);
+      });
+    };
+    api.signUp=async function(email,pass,nick){
+      var a=await sb.rpc('nick_available',{p_nick:nick});
+      if(a.error)throw a.error;
+      if(!a.data)return {ok:false,msg:'Этот ник уже занят.'};
+      var r=await sb.auth.signUp({email:email,password:pass,options:{data:{nick:nick},emailRedirectTo:redirect}});
+      if(r.error)throw r.error;
+      if(r.data.session){S.user=r.data.user;return {ok:true}}
+      return {ok:true,msg:'Мы отправили письмо на '+email+'. Откройте его и подтвердите почту, затем войдите.'};
+    };
+    api.signIn=async function(email,pass){
+      var r=await sb.auth.signInWithPassword({email:email,password:pass});
+      if(r.error)throw r.error;S.user=r.data.user;return {ok:true};
+    };
+    api.signOut=function(){return sb.auth.signOut()};
+    api.reset=async function(email){var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:redirect});if(r.error)throw r.error};
+    api.newPass=async function(p){var r=await sb.auth.updateUser({password:p});if(r.error)throw r.error};
+    api.load=async function(){
+      var p=await sb.from('profiles').select('nick,balance_kop,total_donated_kop,link_code').maybeSingle();
+      var t=await sb.from('transactions').select('id,kind,tier_id,amount_kop,note,created_at').order('created_at',{ascending:false}).limit(50);
+      if(p.error)throw p.error;if(t.error)throw t.error;
+      S.profile=p.data;S.tx=t.data||[];
+    };
+    api.buy=async function(tier){var r=await sb.rpc('purchase_tier',{p_tier:tier.id});if(r.error)throw r.error;return r.data};
+    api.topup=async function(amt){
+      var r=await sb.functions.invoke(C.topupFn,{body:{amount_rub:amt}});
+      if(r.error||!r.data||!r.data.url)return {ok:false,msg:'Приём платежей запускается после подключения кассы. Баланс пополнится автоматически после оплаты.'};
+      location.href=r.data.url;return {ok:true,msg:'Переходим к оплате…'};
+    };
+    api.regen=async function(){var r=await sb.rpc('regenerate_link_code');if(r.error)throw r.error;return r.data};
+  }else{
+    var KEY='rf-demo',mem=null;
+    var dload=function(){try{var r=localStorage.getItem(KEY);if(r)mem=JSON.parse(r)}catch(e){}return mem};
+    var dsave=function(){try{localStorage.setItem(KEY,JSON.stringify(mem))}catch(e){}};
+    var code=function(){return Math.random().toString(16).slice(2,10).toUpperCase().padEnd(8,'0')};
+    var ago=function(d){return new Date(Date.now()-864e5*d).toISOString()};
+    api.init=async function(){var d=dload();S.user=d&&d.signed?{email:d.email}:null};
+    api.signUp=async function(email,pass,nick){
+      mem={email:email,nick:nick,signed:true,balance_kop:50100,total_donated_kop:39900,link_code:code(),tx:[
+        {id:2,kind:'purchase',tier_id:'craftsman',amount_kop:-39900,note:'Покупка: Ремесленник (пример)',created_at:ago(3)},
+        {id:1,kind:'topup',amount_kop:90000,note:'Пополнение баланса (пример)',created_at:ago(5)}]};
+      dsave();S.user={email:email};return {ok:true};
+    };
+    api.signIn=async function(email){
+      var d=dload();
+      if(!d||d.email.toLowerCase()!==email.toLowerCase())return {ok:false,msg:'Демо-режим: сначала зарегистрируйтесь, аккаунт появится в этом браузере.'};
+      d.signed=true;dsave();S.user={email:d.email};return {ok:true};
+    };
+    api.signOut=async function(){if(mem){mem.signed=false;dsave()}};
+    api.reset=async function(){};
+    api.newPass=async function(){};
+    api.load=async function(){S.profile={nick:mem.nick,balance_kop:mem.balance_kop,total_donated_kop:mem.total_donated_kop,link_code:mem.link_code};S.tx=mem.tx.slice()};
+    api.buy=async function(tier){
+      var price=tier.price.RUB*100;
+      if(mem.balance_kop<price)return {ok:false,error:'funds'};
+      mem.balance_kop-=price;mem.total_donated_kop+=price;
+      mem.tx.unshift({id:Date.now(),kind:'purchase',tier_id:tier.id,amount_kop:-price,note:'Покупка: '+tier.name+' (демо)',created_at:new Date().toISOString()});
+      dsave();return {ok:true};
+    };
+    api.topup=async function(amt){
+      mem.balance_kop+=amt*100;
+      mem.tx.unshift({id:Date.now(),kind:'topup',amount_kop:amt*100,note:'Пополнение баланса (демо)',created_at:new Date().toISOString()});
+      dsave();return {ok:true,msg:'Демо: баланс пополнен на '+rub(amt*100)+'. Настоящие платежи появятся после подключения кассы.'};
+    };
+    api.regen=async function(){mem.link_code=code();dsave();return mem.link_code};
+  }
+
+  /* ---------- интерфейс ---------- */
+  function showForm(w){
+    [['login','fLogin'],['signup','fSignup'],['newpass','fNewpass']].forEach(function(p){$('#'+p[1]).hidden=p[0]!==w});
+    $$('[data-atab]').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-atab')===w?'true':'false')});
+    $('#atabs').hidden=(w==='newpass');
+    say($('#authNote'),'');
+  }
+  function paint(){
+    var p=S.profile||{};
+    $('#cbNick').textContent=p.nick||'—';
+    $('#cbEmail').textContent=(S.user&&S.user.email)||'';
+    $('#stBal').textContent=rub(p.balance_kop||0);
+    $('#stTot').textContent=rub(p.total_donated_kop||0);
+    var best=-1;
+    S.tx.forEach(function(t){if(t.tier_id){var i=C.tiers.findIndex(function(x){return x.id===t.tier_id});if(i>best)best=i}});
+    $('#stTier').textContent=best>=0?C.tiers[best].name:'Нет';
+    $('#cbCode').textContent=p.link_code||'—';
+    var ni=$('#nick');if(ni&&!ni.value&&p.nick)ni.value=p.nick;
+    var tb=$('#hist');tb.textContent='';
+    if(!S.tx.length){
+      var r0=document.createElement('tr'),c0=document.createElement('td');c0.colSpan=3;c0.textContent='Платежей пока нет.';r0.appendChild(c0);tb.appendChild(r0);return;
+    }
+    S.tx.forEach(function(t){
+      var tr=document.createElement('tr'),d=document.createElement('td'),o=document.createElement('td'),a=document.createElement('td');
+      d.textContent=new Date(t.created_at).toLocaleDateString('ru-RU');
+      var tier=C.tiers.filter(function(x){return x.id===t.tier_id})[0];
+      o.textContent=t.note||(t.kind==='topup'?'Пополнение баланса':t.kind==='direct'?'Оплата напрямую: '+(tier?tier.name:''):'Покупка');
+      a.className='amt'+(t.kind==='topup'?' pos':'');
+      a.textContent=(t.kind==='topup'?'+':t.kind==='purchase'?'−':'')+rub(Math.abs(t.amount_kop));
+      tr.appendChild(d);tr.appendChild(o);tr.appendChild(a);tb.appendChild(tr);
+    });
+  }
+  async function render(forceAuth){
+    var authed=!!S.user&&!forceAuth;
+    $('#cabAuth').hidden=authed;$('#cabMain').hidden=!authed;
+    if(!authed)return;
+    try{await api.load();paint()}catch(e){toast('Не удалось загрузить данные кабинета')}
+  }
+
+  $$('[data-atab]').forEach(function(b){b.addEventListener('click',function(){showForm(b.getAttribute('data-atab'))})});
+
+  $('#fLogin').addEventListener('submit',async function(e){
+    e.preventDefault();var n=$('#authNote'),email=$('#liEmail').value.trim(),pass=$('#liPass').value;
+    if(!MAIL.test(email)||!pass){say(n,'Введите почту и пароль.','err');return}
+    busy(this,true);
+    try{var r=await api.signIn(email,pass);if(!r.ok)say(n,r.msg,'err');else{say(n,'');$('#liPass').value='';render()}}
+    catch(err){say(n,errText(err),'err')}
+    busy(this,false);
+  });
+  $('#forgot').addEventListener('click',async function(){
+    var n=$('#authNote'),email=$('#liEmail').value.trim();
+    if(!MAIL.test(email)){say(n,'Введите почту в поле выше, и мы отправим ссылку для смены пароля.','err');return}
+    try{await api.reset(email);say(n,'Если такая почта зарегистрирована, мы отправили письмо со ссылкой для смены пароля.','ok')}
+    catch(err){say(n,errText(err),'err')}
+  });
+  $('#fSignup').addEventListener('submit',async function(e){
+    e.preventDefault();var n=$('#authNote');
+    var nick=$('#suNick').value.trim(),email=$('#suEmail').value.trim(),pass=$('#suPass').value;
+    if(!NICK.test(nick)){say(n,'Ник: 3–16 символов, латинские буквы, цифры и «_».','err');return}
+    if(!MAIL.test(email)){say(n,'Введите корректный адрес почты.','err');return}
+    if(pass.length<8){say(n,'Пароль должен быть не короче 8 символов.','err');return}
+    if(!$('#suAgree').checked){say(n,'Подтвердите согласие с документами, чтобы продолжить.','err');return}
+    busy(this,true);
+    try{var r=await api.signUp(email,pass,nick);
+      if(!r.ok)say(n,r.msg,'err');else if(r.msg)say(n,r.msg,'ok');else{say(n,'');render()}}
+    catch(err){say(n,errText(err),'err')}
+    busy(this,false);
+  });
+  $('#fNewpass').addEventListener('submit',async function(e){
+    e.preventDefault();var n=$('#authNote'),p=$('#npPass').value;
+    if(p.length<8){say(n,'Пароль должен быть не короче 8 символов.','err');return}
+    busy(this,true);
+    try{await api.newPass(p);$('#npPass').value='';toast('Пароль изменён');showForm('login');render()}
+    catch(err){say(n,errText(err),'err')}
+    busy(this,false);
+  });
+  $('#logout').addEventListener('click',async function(){
+    try{await api.signOut()}catch(e){}
+    S.user=null;S.profile=null;S.tx=[];showForm('login');render();
+  });
+
+  [200,500,1000,2000,5000].forEach(function(v){
+    var b=document.createElement('button');b.type='button';b.className='curb';b.textContent=v.toLocaleString('ru-RU')+' ₽';
+    b.addEventListener('click',function(){$('#tpAmt').value=v});$('#chips').appendChild(b);
+  });
+  $('#tpAmt').min=C.topupMin;$('#tpAmt').max=C.topupMax;
+  $('#fTop').addEventListener('submit',async function(e){
+    e.preventDefault();var n=$('#topNote'),amt=Number($('#tpAmt').value);
+    if(!Number.isInteger(amt)||amt<C.topupMin||amt>C.topupMax){say(n,'Сумма от '+C.topupMin.toLocaleString('ru-RU')+' до '+C.topupMax.toLocaleString('ru-RU')+' ₽, целым числом.','err');return}
+    busy(this,true);
+    try{var r=await api.topup(amt);say(n,r.msg,r.ok?'ok':'err');if(r.ok&&!live){await api.load();paint()}}
+    catch(err){say(n,errText(err),'err')}
+    busy(this,false);
+  });
+  $('#copyCode').addEventListener('click',function(){
+    try{navigator.clipboard.writeText($('#cbCode').textContent).then(function(){toast('Скопировано')},function(){toast('Выделите код и скопируйте вручную')})}
+    catch(e){toast('Выделите код и скопируйте вручную')}
+  });
+  $('#regenCode').addEventListener('click',async function(){
+    try{var c=await api.regen();$('#cbCode').textContent=c;toast('Новый код создан')}catch(e){toast('Не удалось создать код')}
+  });
+
+  window.RFCab={
+    user:function(){return S.user},
+    buy:async function(tier){
+      try{
+        var r=await api.buy(tier);
+        if(r&&r.ok){await api.load();paint();return {ok:true,msg:'Готово: «'+tier.name+'» оплачена с баланса. Привилегия будет выдана на ник '+((S.profile&&S.profile.nick)||'')+' в течение нескольких минут.'}}
+        if(r&&r.error==='funds')return {ok:false,msg:'Недостаточно средств на балансе. Пополните его в личном кабинете.'};
+        return {ok:false,msg:'Не удалось оплатить. Попробуйте ещё раз.'};
+      }catch(e){return {ok:false,msg:errText(e)}}
+    }
+  };
+
+  var demo=$('#cabDemo');
+  if(!live){
+    demo.hidden=false;
+    demo.textContent=configured
+      ?'Не удалось загрузить модуль входа. Обновите страницу или проверьте подключение.'
+      :'Демонстрационный режим: база данных не подключена. Регистрация, пополнение и покупки имитируются в вашем браузере, настоящие данные не сохраняются.';
+  }
+  api.init().then(function(){showForm('login');render()});
 })();
 </script>
 
